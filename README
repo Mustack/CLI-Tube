@@ -1,0 +1,13 @@
+This doesn't do anything yet so there's no instructions on how to use it.
+
+Dependencies
+	-SQLAlchemy
+	-gdata.youtube
+	-You need your own Google API key
+
+TODO
+	-regex support for filtering which videos are added
+	-playlist support
+	-play oldest/newest unwatched
+	-Add a shell-like interface
+	

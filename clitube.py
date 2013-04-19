@@ -13,10 +13,11 @@ engine = create_engine('sqlite:///clitube.db')
 Session = sessionmaker(bind=engine)
 session = Session()
 
-def add_channel(username, pref_name=None):
+def add_channel(username, pref_name=None, regex=None):
 	#Google/Youtube stuff n things
 	import gdata.youtube
 	import gdata.youtube.service
+	import re
 
 	yt_service = gdata.youtube.service.YouTubeService()
 	yt_service.developer_key = GOOGLE_DEVELOPER_KEY
@@ -36,7 +37,7 @@ def add_channel(username, pref_name=None):
 			name = entry.title.text,
 			url = entry.link[0].href,
 			channel = chan
-		) for entry in feed.entry]
+		) for entry in feed.entry if not regex or re.match(regex, entry.title.text)]
 	)
 
 	session.commit()
@@ -45,21 +46,19 @@ def add_channel(username, pref_name=None):
 
 def play_video(videos):
 	from subprocess import call
-	from time import time #Not kidding
 
 	vlc = ['vlc', '--play-and-exit']
-
-	tolerance = config.get('Options', 'Completion Tolerance')
 
 	for video in videos:
 		vlc.append(video.url)
 		call(vlc)
 		vlc.pop()
-		
+
 		video.watched = True
-		session.commit()
+	
+	session.commit()
 
 #useful for testing
-# create_tables(engine)
-# add_channel('egoraptor', 'ego')
+# create_tables(edngine)
+# add_channel('HuskyStarcraft', 'husky', r'(.*) vs (.*)')
 # play_video([session.query(Video).first()])

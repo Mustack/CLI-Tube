@@ -27,7 +27,7 @@ class Video(Base):
 
 	channel_id = Column(Integer, ForeignKey('channels.id'))
 
-	def __init__(self, name, url, length, channel):
+	def __init__(self, name, url, channel):
 		self.name = name
 		self.url = url.replace('https:', 'http:')
 		self.watched = False

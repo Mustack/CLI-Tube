@@ -6,7 +6,7 @@ Dependencies
 	-You need your own Google API key
 
 TODO
-	-regex support for filtering which videos are added
+	-update channels
 	-playlist support
 	-play oldest/newest unwatched
 	-Add a shell-like interface

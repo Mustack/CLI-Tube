@@ -23,14 +23,15 @@ class Video(Base):
 	id = Column(Integer, primary_key=True)
 	name = Column(String, nullable=False)
 	url = Column(String, nullable=False)
-	channel_id = Column(Integer, ForeignKey('channels.id'))
-	watched = Column(Boolean)
+	watched = Column(Boolean, nullable=False)
 
-	def __init__(self, name, url, channel):
+	channel_id = Column(Integer, ForeignKey('channels.id'))
+
+	def __init__(self, name, url, length, channel):
 		self.name = name
 		self.url = url.replace('https:', 'http:')
-		self.channel = channel
 		self.watched = False
+		self.channel = channel
 
 def create_tables(engine):
 	Base.metadata.create_all(bind=engine)

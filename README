@@ -3,6 +3,7 @@ This doesn't do anything yet so there's no instructions on how to use it.
 Dependencies
 	-SQLAlchemy
 	-gdata.youtube
+	-VLC (on your path)
 	-You need your own Google API key
 
 TODO

@@ -55,8 +55,7 @@ def play_video(videos):
 		vlc.pop()
 
 		video.watched = True
-	
-	session.commit()
+		session.commit()
 
 def play_channel(name, limit=1):
 	query = session.query(Channel).filter(Channel.name == name)
@@ -64,9 +63,15 @@ def play_channel(name, limit=1):
 	if not query.count():
 		query = session.query(Channel).filter(Channel.pref_name == name)
 
-	channel = query.first()
 	if query.count():
-		play_video(session.query(Video).filter(and_(Video.channel==channel, Video.watched==False)).limit(limit))
+		play_video(session.query(Video)
+			.filter(
+				and_(
+					Video.channel==query.first(),
+					Video.watched==False)
+				)
+			.limit(limit)
+		)
 	else:
 		print "ERROR: "+ name +" is not a valid channel name"
 

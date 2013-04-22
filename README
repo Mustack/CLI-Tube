@@ -8,8 +8,9 @@ Dependencies
 
 TODO
 	-update channels
-	-playlist support
 	-play oldest/newest unwatched
 	-Add a shell-like interface
 	-find a better way to determine playback completion
+	-support multiple pref_names
+	-support local files too
 	

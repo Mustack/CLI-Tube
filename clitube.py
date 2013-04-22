@@ -3,12 +3,6 @@ from sqlalchemy.orm import sessionmaker
 
 from models import Video, Channel, Playlist, create_tables
 
-import ConfigParser
-
-config = ConfigParser.ConfigParser()
-config.read('CLI-Tube.ini')
-GOOGLE_DEVELOPER_KEY = config.get('Google API', 'DeveloperKey')
-
 engine = create_engine('sqlite:///clitube.db')
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -34,7 +28,6 @@ def add_channel(username, pref_name=None, regex=None):
 
 
 	yt_service = gdata.youtube.service.YouTubeService()
-	yt_service.developer_key = GOOGLE_DEVELOPER_KEY
 
 	uri = 'http://gdata.youtube.com/feeds/api/users/%s/uploads' % username
 	videos = get_full_feed(yt_service.GetYouTubeVideoFeed(uri=uri))

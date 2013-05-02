@@ -4,13 +4,14 @@ Dependencies
 	-SQLAlchemy
 	-gdata.youtube
 	-VLC (on your path)
-	-You need your own Google API key
 
 TODO
 	-update channels
-	-play oldest/newest unwatched
+	-fix playlist order (not actually checking order)
+	-make playing playlist/channel more consistent
+	-play oldest/newest unwatched (option)
 	-Add a shell-like interface
 	-find a better way to determine playback completion
 	-support multiple pref_names
-	-support local files too
+	-support local video files aswell as youtube videos
 	

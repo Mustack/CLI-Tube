@@ -30,12 +30,10 @@ def add_channel(username, pref_name=None, regex=None):
 	yt_service = gdata.youtube.service.YouTubeService()
 
 	uri = 'http://gdata.youtube.com/feeds/api/users/%s/uploads' % username
-	videos = get_full_feed(yt_service.GetYouTubeVideoFeed(uri=uri))
+	video_feed = get_full_feed(yt_service.GetYouTubeVideoFeed(uri=uri))
 
-	if not videos:
+	if not video_feed:
 		print 'ERROR: invalid youtube user (channel) name'
-
-	playlists = get_full_feed(yt_service.GetYouTubePlaylistFeed(username=username))
 
 	#Now for some sqlalchemy magic
 	chan = Channel(
@@ -44,14 +42,13 @@ def add_channel(username, pref_name=None, regex=None):
 			)
 	session.add(chan)		
 
-	session.add_all(
-		[Video(
-			yt_id=get_id(video),
-			name=video.title.text,
-			channel=chan
-		) for video in videos if not regex or re.match(regex, video.title.text)]
-	)
+	videos = {get_id(video): Video(
+					yt_id=get_id(video),
+					name=video.title.text,
+					channel=chan
+				) for video in video_feed if not regex or re.match(regex, video.title.text)}
 
+	playlists = get_full_feed(yt_service.GetYouTubePlaylistFeed(username=username))
 	for playlist in playlists:
 		pl = Playlist(
 				yt_id=get_id(playlist),
@@ -60,16 +57,14 @@ def add_channel(username, pref_name=None, regex=None):
 			)
 		session.add(pl)
 
-		videos = get_full_feed(yt_service.GetYouTubePlaylistVideoFeed(playlist_id=pl.yt_id))
+		playlist_video_feed = get_full_feed(yt_service.GetYouTubePlaylistVideoFeed(playlist_id=pl.yt_id))
 
-		for index, video in enumerate(videos, start=1):
-			id = video.link[6].href[video.link[6].href.rfind('/')+1:]
-			vid = session.query(Video).filter(Video.yt_id==id)
-			vid.playlist_position = index
-			vid.playlist = pl
-			session.commit()
+		for vid in playlist_video_feed:
+			yt_id = vid.link[3].href[vid.link[3].href.rfind('v=')+2:]
+			videos[yt_id].playlist = pl
 
 
+	session.add_all(videos.values())
 	session.commit()
 
 def play_video(videos):
@@ -90,7 +85,7 @@ def play_channel(name, limit=1):
 
 	if not query.count():
 		query = session.query(Channel).filter(Channel.pref_name == name)
-
+	print query.first().videos
 	if query.count():
 		play_video(session.query(Video)
 			.filter(
@@ -103,8 +98,23 @@ def play_channel(name, limit=1):
 	else:
 		print "ERROR: "+ name +" is not a valid channel name"
 
+def play_playlist(id=None, name=None, new_pref_name=None, limit=1):
+	query = session.query(Playlist)
+
+	if id:
+		playlist = query.get(id)
+	elif name:
+		playlist = query.filter(Playlist.name==name).first()
+	else:
+		print "ERROR: not a valid playlist name/id"
+
+	if playlist:
+		videos = [video for video in playlist.videos if not video.watched]
+		play_video(videos[0:limit])
+
 #useful for testing
 # create_tables(engine)
-# add_channel('GameGrumps', 'grumps')
+add_channel('HuskyStarcraft', 'husky')
 # play_video([session.query(Video).first()])
-play_channel('grumps', 17)
+# play_channel('grumps', 17)
+# play_playlist(id=1)

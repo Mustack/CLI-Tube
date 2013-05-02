@@ -1,6 +1,6 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy import ForeignKey, Column, Integer, String, Boolean
+from sqlalchemy import desc, ForeignKey, Column, Integer, String, Boolean
 from string import rfind
 
 Base = declarative_base()
@@ -28,7 +28,7 @@ class Playlist(Base):
 
 	channel_id = Column(Integer, ForeignKey('channels.id'))
 
-	videos = relationship("Video", backref=backref('playlist'))
+	videos = relationship("Video", backref=backref('playlist'), order_by=desc('videos.id'))
 
 	def __init__(self, yt_id, name, channel):
 		self.yt_id = yt_id.decode('utf-8')
@@ -42,11 +42,10 @@ class Video(Base):
 	id = Column(Integer, primary_key=True)
 	yt_id = Column(String, nullable=False, unique=True)
 	name = Column(String, nullable=False)
-	playlist_position = Column(Integer)
 	watched = Column(Boolean, nullable=False)
 
 	channel_id = Column(Integer, ForeignKey('channels.id'))
-	playlist_id = Column(String, ForeignKey('playlists.id'))
+	playlist_id = Column(Integer, ForeignKey('playlists.id'), nullable=True)
 
 	def __init__(self, yt_id, name, channel):
 		self.yt_id = yt_id.decode('utf-8')

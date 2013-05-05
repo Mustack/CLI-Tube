@@ -12,6 +12,7 @@ class Channel(Base):
 	pref_name = Column(String)  #TODO: enforce uniqueness across name and pref_name
 
 	videos = relationship("Video", backref=backref('channel', order_by=id))
+	playlists = relationship("Playlist", backref=backref('channel'))
 
 	def __init__(self, name, pref_name=None):
 		self.name = name.decode('utf-8')

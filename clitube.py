@@ -42,7 +42,7 @@ def add_channel(username, pref_name=None, regex=None):
 			)
 	session.add(chan)		
 
-	videos = {get_id(video): Video(
+	videos = {video.title.text: Video(
 					yt_id=get_id(video),
 					name=video.title.text,
 					channel=chan
@@ -59,10 +59,16 @@ def add_channel(username, pref_name=None, regex=None):
 
 		playlist_video_feed = get_full_feed(yt_service.GetYouTubePlaylistVideoFeed(playlist_id=pl.yt_id))
 
-		for vid in playlist_video_feed:
-			yt_id = vid.link[3].href[vid.link[3].href.rfind('v=')+2:]
-			videos[yt_id].playlist = pl
-
+		for video in playlist_video_feed:
+			try:
+				videos[video.title.text].playlist = pl
+			except:
+				link = video.link[0].href
+				videos[video.title.text]=Video(
+					yt_id=link[link.rfind('v=')+2 : link.rfind('&')],
+					name=video.title.text,
+					channel=None
+				)
 
 	session.add_all(videos.values())
 	session.commit()
@@ -114,7 +120,8 @@ def play_playlist(id=None, name=None, new_pref_name=None, limit=1):
 
 #useful for testing
 # create_tables(engine)
-add_channel('HuskyStarcraft', 'husky')
+# add_channel('HuskyStarcraft', 'husky')
+# add_channel('GameGrumps', 'grumps')
 # play_video([session.query(Video).first()])
 # play_channel('grumps', 17)
 # play_playlist(id=1)
